@@ -294,5 +294,5 @@ if __name__ == '__main__':
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     print("🚀 Запуск мессенджера...")
-    print(f"📍 Адрес: http://0.0.0.0:{port}")
-    socketio.run(app, host='0.0.0.0', port=port, debug=False)
+    print(f"📍 Порт: {port}")
+    socketio.run(app, host='0.0.0.0', port=port, debug=False, allow_unsafe_werkzeug=True)
