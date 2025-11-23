@@ -10,8 +10,16 @@ app.config['SECRET_KEY'] = 'super-secret-key-12345'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# ⭐ ДОБАВЬ ЭТИ СТРОКИ ДЛЯ УСКОРЕНИЯ ⭐
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_recycle': 300,
+    'pool_pre_ping': True
+}
+app.config['SOCKETIO_ASYNC_MODE'] = 'eventlet'
+# ⭐ КОНЕЦ ДОБАВЛЕНИЯ ⭐
+
 db = SQLAlchemy(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # ----------------- Модели -----------------
 class User(db.Model):
