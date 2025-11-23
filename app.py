@@ -4,29 +4,31 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, emit, join_room
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+import socket
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'super-secret-key-12345'
 
-# ⭐ НАСТРОЙКА БАЗЫ ДАННЫХ ДЛЯ RENDER ⭐
-if os.environ.get('RENDER'):
-    # На Render - используем PostgreSQL
+# 🔥 ГИБРИДНАЯ НАСТРОЙКА БАЗЫ ДАННЫХ 🔥
+is_render = os.environ.get('RENDER') or os.environ.get('DATABASE_URL')
+
+if is_render:
+    # 🌐 РЕЖИМ RENDER - PostgreSQL
     database_url = os.environ.get('DATABASE_URL')
     if database_url and database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    print("🌐 РЕЖИМ: RENDER (PostgreSQL) - ДЛЯ КРУТОСТИ!")
 else:
-    # Локально - используем SQLite
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+    # 💻 РЕЖИМ ЛОКАЛЬНЫЙ - SQLite (УЛЬТРА БЫСТРЫЙ!)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_database.db'
+    print("💻 РЕЖИМ: ЛОКАЛЬНЫЙ (SQLite) - ДЛЯ СКОРОСТИ!")
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# ⭐ ДОБАВЬ ЭТИ СТРОКИ ДЛЯ УСКОРЕНИЯ ⭐
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_recycle': 300,
     'pool_pre_ping': True
 }
-# ⭐ КОНЕЦ ДОБАВЛЕНИЯ ⭐
 
 db = SQLAlchemy(app)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
@@ -54,7 +56,10 @@ class Message(db.Model):
 # ----------------- Создание базы -----------------
 with app.app_context():
     db.create_all()
-    print("✅ База данных готова")
+    if is_render:
+        print("✅ База данных готова (PostgreSQL на Render)")
+    else:
+        print("✅ База данных готова (SQLite локально)")
 
 # ----------------- Маршруты -----------------
 @app.route('/')
@@ -296,9 +301,34 @@ def handle_send_message(data):
     
     print(f'📤 Сообщение отправлено в комнаты {receiver_id} и {sender_id}')
 
+# 🔥 УМНЫЙ ЗАПУСК С АВТООПРЕДЕЛЕНИЕМ IP 🔥
+def get_local_ip():
+    """Получает локальный IP адрес для сети"""
+    try:
+        # Создаем временное соединение чтобы узнать свой IP
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))
+            return s.getsockname()[0]
+    except:
+        return "192.168.1.XXX"  # Замени на свой IP вручную
+
 # ----------------- Запуск -----------------
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    print("🚀 Запуск мессенджера...")
-    print(f"📍 Порт: {port}")
-    socketio.run(app, host='0.0.0.0', port=port, debug=False, allow_unsafe_werkzeug=True)
+    if is_render:
+        # 🌐 РЕЖИМ RENDER
+        port = int(os.environ.get('PORT', 5000))
+        print("🎉" * 50)
+        print("🚀 ЗАПУСК НА RENDER - ДЛЯ КРУТОСТИ И ВЪЕБЫВАНИЯ!")
+        print(f"📍 Твой мессенджер в интернете!")
+        print("🎉" * 50)
+        socketio.run(app, host='0.0.0.0', port=port, debug=False, allow_unsafe_werkzeug=True)
+    else:
+        # 💻 РЕЖИМ ЛОКАЛЬНЫЙ
+        local_ip = get_local_ip()
+        print("⚡" * 50)
+        print("🚀 ЗАПУСК ЛОКАЛЬНО - ДЛЯ УЛЬТРА СКОРОСТИ!")
+        print(f"📍 Твой компьютер: http://localhost:5000")
+        print(f"📍 Для брата в сети: http://{local_ip}:5000")
+        print("⚡ Общайтесь МГНОВЕННО с братом!")
+        print("⚡" * 50)
+        socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
