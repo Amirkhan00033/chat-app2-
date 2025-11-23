@@ -285,13 +285,14 @@ if __name__ == '__main__':
     print("📍 Адрес: http://localhost:5000")
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)
 
-# НА ЭТУ:
+if __name__ == '__main__':
+    print("🚀 Запуск исправленного мессенджера...")
+    print("📍 Адрес: http://localhost:5000")
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+
+# НА:
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    debug = os.environ.get('DEBUG', 'False').lower() == 'true'
-    
     print("🚀 Запуск мессенджера...")
-    print(f"📍 Порт: {port}")
-    print(f"📍 Debug: {debug}")
-    
-    socketio.run(app, host='0.0.0.0', port=port, debug=debug)
+    print(f"📍 Адрес: http://0.0.0.0:{port}")
+    socketio.run(app, host='0.0.0.0', port=port, debug=False)
