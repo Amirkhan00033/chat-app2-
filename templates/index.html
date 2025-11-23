@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Чат-приложение</title>
+</head>
+<body>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    background: #f5f6fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    width: 350px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #2f3640;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #dcdde1;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #273c75;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #192a56;
+}
+
+.toggle-link {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #273c75;
+    cursor: pointer;
+}
+
+.toggle-link:hover {
+    text-decoration: underline;
+}
+
+    </style>
+<div class="container">
+    <h2 id="form-title">Вход</h2>
+    <form id="auth-form" method="POST" action="/login">
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <input type="text" name="username" placeholder="Имя пользователя" id="username-field" style="display:none;" required>
+        <button type="submit">Войти</button>
+    </form>
+    <span class="toggle-link" id="toggle-link">Нет аккаунта? Зарегистрироваться</span>
+</div>
+
+<script>
+const toggleLink = document.getElementById('toggle-link');
+const formTitle = document.getElementById('form-title');
+const form = document.getElementById('auth-form');
+const usernameField = document.getElementById('username-field');
+
+let isLogin = true;
+
+toggleLink.addEventListener('click', () => {
+    if (isLogin) {
+        form.action = "/register";
+        formTitle.textContent = "Регистрация";
+        usernameField.style.display = "block";
+        form.querySelector('button').textContent = "Зарегистрироваться";
+        toggleLink.textContent = "Уже есть аккаунт? Войти";
+    } else {
+        form.action = "/login";
+        formTitle.textContent = "Вход";
+        usernameField.style.display = "none";
+        form.querySelector('button').textContent = "Войти";
+        toggleLink.textContent = "Нет аккаунта? Зарегистрироваться";
+    }
+    isLogin = !isLogin;
+});
+</script>
+</body>
+</html>
