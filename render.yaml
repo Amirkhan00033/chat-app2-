@@ -1,10 +1,10 @@
 services:
   - type: web
-    name: chat-app
+    name: chat-app-simple
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn --worker-class eventlet -w 1 app:app --bind 0.0.0.0:$PORT
+    startCommand: python app_simple.py
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.0  # ← ИЗМЕНИТЕ НА ЭТО!
+        value: 3.11.0
