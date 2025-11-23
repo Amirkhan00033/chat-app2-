@@ -7,7 +7,18 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'super-secret-key-12345'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
+# ⭐ НАСТРОЙКА БАЗЫ ДАННЫХ ДЛЯ RENDER ⭐
+if os.environ.get('RENDER'):
+    # На Render - используем PostgreSQL
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url and database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Локально - используем SQLite
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # ⭐ ДОБАВЬ ЭТИ СТРОКИ ДЛЯ УСКОРЕНИЯ ⭐
@@ -15,7 +26,6 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_recycle': 300,
     'pool_pre_ping': True
 }
-app.config['SOCKETIO_ASYNC_MODE'] = 'eventlet'
 # ⭐ КОНЕЦ ДОБАВЛЕНИЯ ⭐
 
 db = SQLAlchemy(app)
@@ -287,18 +297,6 @@ def handle_send_message(data):
     print(f'📤 Сообщение отправлено в комнаты {receiver_id} и {sender_id}')
 
 # ----------------- Запуск -----------------
-# ЗАМЕНИ ЭТУ ЧАСТЬ В КОНЦЕ ФАЙЛА:
-if __name__ == '__main__':
-    print("🚀 Запуск исправленного мессенджера...")
-    print("📍 Адрес: http://localhost:5000")
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
-
-if __name__ == '__main__':
-    print("🚀 Запуск исправленного мессенджера...")
-    print("📍 Адрес: http://localhost:5000")
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
-
-# НА:
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     print("🚀 Запуск мессенджера...")
