@@ -3,11 +3,8 @@ services:
     name: chat-app
     env: python
     plan: free
-    branch: main
-    buildCommand: |-
-      pip install -r requirements.txt
-    startCommand: |-
-      python app.py
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --worker-class eventlet -w 1 app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
-        value: 3.13.7
+        value: 3.11.0  # ← ИЗМЕНИТЕ НА ЭТО!
